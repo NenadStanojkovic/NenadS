@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+ <head>
+    <meta charset="UTF-8">
+    <!-- <script src="https://code.jquery.com/jquery-1.10.2.js"></script> -->
+
+    <style>
+        .s {
+            display: block;
+            margin: 10;
+        }
+
+        .r {
+            width: 80px;
+            display: inline-block;
+            margin: 10;
+        }
+
+        .k {
+            width: 250px;
+        }
+
+        .gotovi {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+ <body>
+    <div class="r k">Список за пазарење:</div>
+     <div class="s" id="seceka">
+     </div>
+     <div class="s">
+         <input id="novo" onfocus="this.value=''">
+         <input type="button" value="Додади" onclick="dodadi();" > <br>
+     </div>
+     <div class="s gotovi" id="neseceka">
+     </div>
+<script>
+var Lista=[]; 
+    fetch('http://blueshift.eu.ngrok.io/spisok').then(function(response){
+        response.text().then(function(bodyString){
+            let json=JSON.parse(bodyString);
+
+            Lista=json;
+                    
+            populate(json);
+            
+        })
+    })
+
+    function swapFunkcija1(ids)
+    {
+        for(let i=0;i<Lista.length;i++)
+        {
+            if(Lista[i].id==ids)
+            {
+                if(Lista[i].nabaven==true)
+                {
+                    Lista[i].nabaven=false;
+                }
+                else
+                {
+                    Lista[i].nabaven=true;
+                }
+            }
+        }
+        document.getElementById("neseceka").innerHTML="";
+        document.getElementById("seceka").innerHTML="";
+
+        // Povtorno citanje i dodavanje
+        populate(Lista);
+    
+    }  
+    function populate(lista)
+    {
+
+        for(let i=0;i<lista.length;i++)
+            {
+                let temp=lista[i];
+            
+                if(temp.nabaven==true)
+                {
+                    
+                    let nabaveni=document.getElementById("neseceka");
+                    let dodadi=nabaveni.innerHTML;
+                    dodadi=dodadi+`<input type="checkbox" id="${temp.id}" checked name="${temp.ime}" onclick="swapFunkcija1('${temp.id}');">${temp.ime}<br>`
+                    //console.log(dodadi);
+                    nabaveni.innerHTML=dodadi;
+                    
+                }
+                else
+                {
+                    let nenabaveni=document.getElementById("seceka");
+                    let dodadi2=nenabaveni.innerHTML;
+                    dodadi2=dodadi2+`<input type="checkbox" id="${temp.id}" name="${temp.ime}" onclick="swapFunkcija1('${temp.id}');">${temp.ime}<br>`
+                    //console.log(dodadi2);
+                    nenabaveni.innerHTML=dodadi2;
+                    
+                }
+                
+            }
+    }
+    
+    function dodadi()
+    {
+        let novProizvod=document.getElementById("novo");
+        let vrednost=novProizvod.value;
+        //console.log(vrednost);
+        document.getElementById("novo");
+        if(vrednost=="")
+        {
+            document.getElementById("novo").required=true;
+        }
+        else
+        {
+            let proverka=false;
+            for(let d=0;d<Lista.length;d++)
+            {
+                if(Lista[d].ime==vrednost)
+                {
+                    alert("Vekje postoi takov produkt vo listata");
+                    proverka=true;
+                }
+            }
+            if(!proverka){
+            fetch("http://blueshift.eu.ngrok.io/dodadi", {
+                method: "POST",
+                body: JSON.stringify({ ime: vrednost})
+            }).then(function(response){
+
+                 response.text().then(function(povratenString)
+                {
+                    let json=JSON.parse(povratenString);
+                    //console.log(json);
+                    Lista=json;
+                    document.getElementById("neseceka").innerHTML="";
+                    document.getElementById("seceka").innerHTML="";
+                    populate(json);
+                })
+            })
+        }
+        }
+
+    }
+
+
+</script>
+</body>
+</html>
