@@ -17,13 +17,27 @@
              margin-bottom: 1%;
              margin-right: 1%; 
          }
+         p
+         {
+            display: inline-block;
+         }
+         #vremePriem
+         {
+             margin-right: 1.1%;
+             
+         }
+         #vremeDostava
+         {
+             margin-right: 0.5%;
+             
+         }
      </style>
     <div id="inputdata">
         <h1 id="naslov">Prikaz na smetka</h1>
-        Datum na priem <input type="date" id="priem" onfocus="this.value=''">
-        Vreme na priem <input type="time" id="priemVreme" onfocus="this.value=''"><br>
-        Datum na dostava  <input type="date" id="dostava" onfocus="this.value=''">
-        Vreme na dostava <input type="time" id="dostavaVreme" onfocus="this.value=''"><br>
+        <p>Datum na priem </p><input type="date" id="priem" onfocus="this.value=''">
+        <p id="vremePriem">Vreme na priem</p><input type="time" id="priemVreme" onfocus="this.value=''"><br>
+        <p>Datum na dostava</p><input type="date" id="dostava" onfocus="this.value=''">
+        <p id="vremeDostava">Vreme na dostava</p><input type="time" id="dostavaVreme" onfocus="this.value=''"><br>
         <button id="presmetka" onclick="Funkcija();">
          Presmetaj
         </button>
