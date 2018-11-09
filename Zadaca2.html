@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+ <head>
+    <meta charset="UTF-8">
+</head>
+ <body>
+     <style>
+         #priem
+         {
+             margin-left: 2%;
+             margin-bottom: 1%; 
+             margin-right: 1%;
+         }
+         #dostava
+         {
+             margin-left: 1.4%;
+             margin-bottom: 1%;
+             margin-right: 1%; 
+         }
+     </style>
+    <div id="inputdata">
+        <h1 id="naslov">Prikaz na smetka</h1>
+        Datum na priem <input type="date" id="priem" onfocus="this.value=''">
+        Vreme na priem <input type="time" id="priemVreme" onfocus="this.value=''"><br>
+        Datum na dostava  <input type="date" id="dostava" onfocus="this.value=''">
+        Vreme na dostava <input type="time" id="dostavaVreme" onfocus="this.value=''"><br>
+        <button id="presmetka" onclick="Funkcija();">
+         Presmetaj
+        </button>
+    </div>
+    <div id="tabela">
+       
+    </div>
+<script>
+    function Funkcija()
+    {
+       vrednost1=document.getElementById("priem").value;
+       vreme1=document.getElementById("priemVreme").value;
+
+       vrednost2=document.getElementById("dostava").value;
+       vreme2=document.getElementById("dostavaVreme").value;
+    //    console.log(vrednost1);
+    //    console.log(vreme2);
+
+       //VALIDACIJA
+
+       let flag=[1,1,1,1];
+       if(vrednost1=="")
+        {
+            document.getElementById("priem").required=true;
+            flag[0]=0;
+        }
+        if(vrednost2=="")
+        {
+            document.getElementById("dostava").required=true;
+            flag[1]=0;
+        }
+        if(vreme1=="")
+        {
+            document.getElementById("priemVreme").required=true;
+            flag[2]=0;
+        }
+        if(vreme2=="")
+        {
+            document.getElementById("dostavaVreme").required=true;
+            flag[3]=0;
+        }
+        if(flag[0]==1 && flag[1]==1 && flag[2]==1 && flag[3]==1)
+        {
+            let denovi1=Denovi(vrednost1);
+            let denovi2=Denovi(vrednost2);
+            //console.log(denovi1);
+            
+            rabotaTabela(vreme1,denovi1,vreme2,denovi2);
+        }
+    }
+
+    function Denovi(datum)
+    {
+       let vkupnoDenovi=0;
+       let part=datum.split("-");
+
+       let meseci=parseInt(part[1]-1);
+       let den=parseInt(part[2]);
+       let godina=parseInt(part[0]);
+       //console.log(meseci);
+
+       vkupnoDenovi=vkupnoDenovi+godina*365+den;
+       switch(meseci)
+       {
+           case 0: vkupnoDenovi=vkupnoDenovi+0; break;
+           case 1: vkupnoDenovi=vkupnoDenovi+0+31; break;
+           case 2: vkupnoDenovi=vkupnoDenovi+31+27; break;
+           case 3: vkupnoDenovi=vkupnoDenovi+31+27+31; break;
+           case 4: vkupnoDenovi=vkupnoDenovi+31+27+31+30; break;
+           case 5: vkupnoDenovi=vkupnoDenovi+31+27+31+30+31; break;
+           case 6: vkupnoDenovi=vkupnoDenovi+31+27+31+30+31+30; break;
+           case 7: vkupnoDenovi=vkupnoDenovi+31+27+31+30+31+30+31; break;
+           case 8: vkupnoDenovi=vkupnoDenovi+31+27+31+30+31+30+31+31; break;
+           case 9: vkupnoDenovi=vkupnoDenovi+31+27+31+30+31+30+31+31+30; break;
+           case 10: vkupnoDenovi=vkupnoDenovi+31+27+31+30+31+30+31+31+30+31; break;
+           case 11: vkupnoDenovi=vkupnoDenovi+31+27+31+30+31+30+31+31+30+31+30; break;
+       }
+       
+       // PRESTAPNA GODINA
+       if(godina%4==0)
+       {
+          vkupnoDenovi=vkupnoDenovi+1;
+       }
+       return vkupnoDenovi;
+    }
+
+    function rabotaTabela(time1,days1,time2,days2)
+    {
+        let tmp1=time1.split(":");
+        let tmp2=time2.split(":");
+
+        let cas1=parseInt(tmp1[0]);
+        let min1=parseInt(tmp1[1]);
+
+        let cas2=parseInt(tmp2[0]);
+        let min2=parseInt(tmp2[1]);
+        let start = (min1 / 60) + cas1;
+        start=+(start.toFixed(2));
+
+        let razlikaCasovi=(min2/60+cas2+days2*24)-(min1/60+cas1+days1*24);
+        razlikaCasovi=+(razlikaCasovi.toFixed(2));
+        //console.log(razlikaCasovi);
+        
+        let cena=[0,0,0,0];
+        let CasoviSmena=[0,0,0,0];
+        
+        while(razlikaCasovi>1)
+        {
+           if(start>=6 && start<18)
+           {
+               let pom1=18-start;
+               CasoviSmena[0]=CasoviSmena[0]+pom1;
+               razlikaCasovi=+((razlikaCasovi-pom1).toFixed(2));
+               start=start+pom1;
+               if(razlikaCasovi<1)
+               {
+                   CasoviSmena[1]=CasoviSmena[1]+razlikaCasovi;
+                   break;
+               }
+           }
+           if(start>=18 && start<22)
+           {
+               let pom2=22-start;
+               CasoviSmena[1]=CasoviSmena[1]+pom2;
+               razlikaCasovi=+((razlikaCasovi-pom2).toFixed(2));
+               start=start+pom2;
+               if(razlikaCasovi<1)
+               {
+                   CasoviSmena[2]=CasoviSmena[2]+razlikaCasovi;
+                   break;
+               }
+           }
+           if(start>=22 && start<24)
+           {
+               let pom3=24-start;
+               CasoviSmena[2]=CasoviSmena[2]+pom3;
+               razlikaCasovi=+((razlikaCasovi-pom3).toFixed(2));;
+               start=start+pom3;
+               start=start-24;
+               if(razlikaCasovi<1)
+               {
+                   CasoviSmena[3]=CasoviSmena[3]+razlikaCasovi;
+                   break;
+               }
+               
+           }
+           if(start>=0 && start<6)
+           {
+               let pom4=6-start;
+               CasoviSmena[3]=CasoviSmena[3]+pom4;
+               razlikaCasovi=+((razlikaCasovi-pom4).toFixed(2));
+               start=start+pom4;
+               if(razlikaCasovi<1)
+               {
+                   CasoviSmena[0]=CasoviSmena[0]+razlikaCasovi;
+                   break;
+               }
+               
+           }
+        }
+         
+        cena[0]=cena[0]+CasoviSmena[0]*10;
+        cena[1]=cena[1]+CasoviSmena[1]*15;
+        cena[2]=cena[2]+CasoviSmena[2]*25;
+        cena[3]=cena[3]+CasoviSmena[3]*30;
+
+        let vk=0;
+        let rab=0;
+        for(let i=0;i<4;i++)
+        {
+            vk=vk+cena[i];
+            rab=rab+CasoviSmena[i];
+        }
+        vk=+(vk.toFixed(2));
+        rab=+(rab.toFixed(2));
+
+
+        let info=document.getElementById("tabela");
+        info.innerHTML="";
+        info.innerHTML=info.innerHTML+
+    `<table cellspacing="30%">
+        <tr>
+            <td>Denska smena (06:00 - 18:00)</td>
+            <td>${CasoviSmena[0]}</td>
+            <td>€10</td>
+            <td>€${cena[0]}</td>
+        </tr>
+        <tr>
+            <td>Vecerna smena (18:00 - 22:00)</td>
+            <td>${CasoviSmena[1]}</td>
+            <td>€15</td>
+            <td>€${cena[1]}</td>
+        </tr>
+        <tr>
+            <td>Polnokjna smena (22:00 - 24:00)</td>
+            <td>${CasoviSmena[2]}</td>
+            <td>€25</td>
+            <td>€${cena[2]}</td>
+        </tr>
+        <tr>
+            <td>Utrinska smena (00:00 - 06:00)</td>
+            <td>${CasoviSmena[3]}</td>
+            <td>€30</td>
+            <td>€${cena[3]}</td>
+        </tr>
+        <tr>
+            <td>Vkupno</td>
+            <td>${rab}</td>
+            <td></td>
+            <td>€${vk}</td>
+        </tr>
+    </table>`
+
+    }
+
+</script>
+</body>
+</html>
