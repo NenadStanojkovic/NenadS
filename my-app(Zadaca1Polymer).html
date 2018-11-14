@@ -1,0 +1,180 @@
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<dom-module id="my-app">
+  <template>
+    <style>
+       h2{
+         margin-left: 1%;
+       }
+      .content paper-checkbox
+      {
+          display: block;
+          margin-bottom: 0.3%;
+          margin-left: 1%;
+      }
+      .content paper-button{
+        background-color: bisque;
+        margin: 1%;
+      }
+      .content paper-input
+      {
+        display: inline-block;
+        margin-left: 1%;
+      }
+
+    </style>
+      
+      <div class="content">
+        <h2>Lista Proizvodi</h2>
+        <template is="dom-repeat" items="{{nenabaveni}}">
+
+            <paper-checkbox checked="{{item.nabaven}}" on-change="onProductChecked">{{item.ime}}</paper-checkbox>
+        </template>
+            <paper-input id="vnesTekst" placeholder="Vnesi proizvod"></paper-input>
+            <paper-button id="dodadi" on-click="Prezemi">Dodadi</paper-button>
+
+        <template is="dom-repeat" items="{{nabaveni}}">
+
+            <paper-checkbox checked="{{item.nabaven}}" on-change="onProductChecked">{{item.ime}}</paper-checkbox>
+
+        </template>
+    </div>
+    
+  </template>
+
+  <script>
+
+    class MyApp extends Polymer.Element {
+      static get is() { return 'my-app'; }
+
+      static get properties() {
+        return {
+             nabaveni:{
+               type: Array,
+               value: () => {
+                 return []
+               }
+             },
+             nenabaveni:{
+              type: Array,
+              value: () => {
+                return []
+              },
+            } 
+
+        };
+      }
+
+      ready()
+      {
+        super.ready();
+        //debugger
+
+        fetch("http://blueshift.eu.ngrok.io/spisok").then((response)=>{
+          response.json().then((result)=>{
+            
+            this.populate(result);
+
+            //console.log(this.nabaveni);
+          })
+        })
+      }
+      
+      populate(result)
+      {
+        for(let i=0; i < result.length; i++){
+              if(result[i].nabaven)
+                this.push("nabaveni", result[i]);
+              else
+                this.push("nenabaveni", result[i]);
+            }
+      }
+
+      onProductChecked(event)
+      {
+        let klik=event.model.item;
+        let indeks=event.model.index;
+        console.log(indeks);
+        //debugger
+        if(klik.nabaven)
+        {
+
+
+            this.splice("nenabaveni", indeks,1);  
+            // klik.nabaven=true;       
+            this.push("nabaveni", klik);
+        }
+        else
+        {
+          this.splice("nabaveni", indeks, 1);
+            // klik.nabaven=false;
+            this.push("nenabaveni", klik);             
+        }
+        
+         let pom=this.nenabaveni;
+         pom.concat(this.nabaveni);
+
+        fetch("http//blueshift.eu.ngrok.io/cekiraj", {
+          method: "UPDATE",
+          body: JSON.stringify(pom),
+        }).then((response) =>{
+          //console.log(response);
+        })
+      }
+        
+        Prezemi()
+        {
+           let flag=true;
+           let tmp=this.$.vnesTekst;
+           if(tmp.value=="")
+           {
+              alert("Vnesi vrednost pred da dodades");
+           }
+           else{
+             // PROVERKA POSTOECKI
+             
+             for(let i=0;i<this.nabaveni.length;i++)
+             {
+               if(tmp.value.toLowerCase()==this.nabaveni[i].ime.toLowerCase())
+               {
+                 alert("Postoi takov proizvod vo listata");
+                 flag=false;
+                 break;
+               }
+             }
+             for(let i=0;i<this.nenabaveni.length;i++)
+             {
+               if(tmp.value.toLowerCase()==this.nenabaveni[i].ime.toLowerCase())
+               {
+                 alert("Postoi takov proizvod vo listata");
+                 flag=false;
+                 break;
+               }
+             }
+             if(flag)
+             {
+               fetch("http://blueshift.eu.ngrok.io/dodadi", {
+                 method: "POST",
+                 body: JSON.stringify({ime : tmp.value})
+             }).then((response) => {
+              response.json().then((result)=>{
+                    this.nenabaveni=[];
+                    this.nabaven=[];
+                    this.populate(result);
+              })
+             })
+            }
+           }
+        }
+
+    }
+
+    window.customElements.define(MyApp.is, MyApp);
+  </script>
+</dom-module>
