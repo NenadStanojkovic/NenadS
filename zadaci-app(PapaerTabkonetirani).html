@@ -1,0 +1,54 @@
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+
+<link rel="import" href="my-app.html">
+<link rel="import" href="my-app2.html">
+
+<dom-module id="zadaci-app">
+  <template>
+    <style>
+
+    </style>
+     
+     <paper-tabs selected="{{page}}">
+     <paper-tab on-tap="test">Zadaca eden</paper-tab>
+     <paper-tab on-tap="test">Zadaca dva</paper-tab>
+     </paper-tabs>
+
+     <iron-pages selected="[[page]]" fallback-selection="0">
+     <my-app></my-app>
+     <my-app2></my-app2>
+     </iron-pages>
+      
+    
+  </template>
+
+  <script>
+
+    class App extends Polymer.Element {
+      static get is() { return 'zadaci-app'; }
+
+      static get properties() {
+        return {
+             page:{
+                 type: Number,
+                 value: 0
+             }
+              
+        };
+      }
+      test()
+      {
+        console.log(this.page);
+      }  
+        
+    }
+
+    window.customElements.define(App.is, App);
+  </script>
+</dom-module>
